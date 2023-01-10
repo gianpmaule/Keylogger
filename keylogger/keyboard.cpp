@@ -46,6 +46,7 @@ std::string Keyboard::describeKey(BYTE vk) {
 		CaseReturnString(VK_DELETE, "[DEL]");
 		CaseReturnString(VK_LWIN, "[LWIN]");
 		CaseReturnString(VK_RWIN, "[RWIN]");
+		CaseReturnString(VK_APPS, "[MENU]");
 		CaseReturnString(VK_NUMPAD0, "[NUMPAD 0]");
 		CaseReturnString(VK_NUMPAD1, "[NUMPAD 1]");
 		CaseReturnString(VK_NUMPAD2, "[NUMPAD 2]");
