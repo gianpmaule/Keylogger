@@ -11,8 +11,8 @@ class Key {
 	//The Windows API async keystate (pressed or not)
 	SHORT state;
 
-	//Is false when key is released
-	//Is true when the key is shifting from
+	//Is true when the key is shifting states (pressed and released)
+	//Is false otherwise
 	bool alternating;
 
 	public:

