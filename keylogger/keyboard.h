@@ -1,31 +1,24 @@
 #pragma once
-#include <thread>
+#include <vector>
+#include <chrono>
+
 #include "key.h"
 
-#define KEYBOARDSIZE 255
-typedef std::chrono::milliseconds milliseconds;
-#define sleep(time) std::this_thread::sleep_for(time)
+using milliseconds = std::chrono::milliseconds;
+using namespace std::literals::chrono_literals;
 
 class Keyboard {
-	private:
-	//An array with all the Windows API keys
-	Key** keys;
+private:
+	std::vector<Key> keys;
 
-	public:
-	//The refresh rate of the keyboard. Used with the injected Keylogger class.
+protected:
+	static const int KEYBOARDSIZE;
+	void setKeyState(BYTE index, SHORT state);
+
+public:
 	milliseconds polling;
-	//Initialized with the Keyboard initialization
-	Keylogger* keylogger;
 
-	//Creates a standard Ansi keyboard and initializes the local Keylogger class
-	Keyboard();
+	Keyboard(milliseconds polling);
 
-	//Returns keys
-	Key** getKeys() const;
-	
-	//Describe Ansi keys with Microsoft keycodes
-	//Doesn't describe redundant keys, as in CTRL, LCTRL and RCTRL (doesn't describe CTRL)
-	static std::string describeKey(BYTE vk);
-
-	friend class Keylogger;
+	const std::vector<Key>& const getKeys() const;
 };

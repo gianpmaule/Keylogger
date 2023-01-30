@@ -1,19 +1,29 @@
 #include "key.h"
 
-Key::Key(BYTE value, std::string description)
+constexpr auto PRESSED = 0x8000;
+constexpr auto TOGGLED = 0x0001;
+
+Key::Key(BYTE value)
 	: value(value)
-	, description(std::string(description))
 	, state(0)
 	, alternating(false) {}
 
-bool Key::isPressed() {
+void Key::setState(SHORT state) {
+	bool oldpressed = isPressed();
+	this->state = state;
+	bool curpressed = isPressed();
+
+	alternating = oldpressed != curpressed ? true : false;
+}
+
+bool Key::isPressed() const {
 	return (state & PRESSED);
 }
-bool Key::isTriggered() {
-	bool triggered = isPressed() && alternating;
-	alternating = false;
-	return triggered;
-}
-bool Key::isToggled() {
+
+bool Key::isToggled() const {
 	return (GetKeyState(value) & TOGGLED);
+}
+
+bool Key::isTriggered() const {
+	return (isPressed() && alternating);
 }
