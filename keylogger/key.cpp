@@ -1,7 +1,7 @@
 #include "key.h"
 
-constexpr auto PRESSED = 0x8000;
-constexpr auto TOGGLED = 0x0001;
+const int Key::PRESSED = 0x8000;
+const int Key::TOGGLED = 0x0001;
 
 Key::Key(BYTE value)
 	: value(value)

@@ -5,7 +5,9 @@ class Key {
 private:
 	SHORT state;
 	bool alternating;
-
+	
+	static const int PRESSED;
+	static const int TOGGLED;
 public:
 	const BYTE value;		
 	Key(BYTE value);
