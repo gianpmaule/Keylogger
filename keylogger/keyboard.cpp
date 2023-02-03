@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "keyboard.h"
-
+#include <iostream>
 namespace LayoutFactory {
 		//layout[VK_ESCAPE] = { L"[ESC]" };
 		//layout[VK_F1] = { L"[F1]" };
@@ -111,7 +111,7 @@ namespace LayoutFactory {
 Keyboard::Keyboard()
 	: keys()
 	, polling(1ms)
-	, layout() 
+	, locale(nullptr) 
 {
 	keys.reserve(KEYBOARDSIZE);
 	changeLayout(L"KBDUSX");
@@ -121,18 +121,47 @@ Keyboard::Keyboard()
 	}
 }
 
+const std::vector<Layout> Keyboard::getKeysLayout(const KBDTABLES* locale) {
+	std::vector<Layout> newLayout;
+
+	for (auto* layout = locale->pVkToWcharTable
+	    ;layout->pVkToWchars
+		;layout++) 
+	{
+		for (auto* key = layout->pVkToWchars
+			;key->VirtualKey
+			;key = (VK_TO_WCHARS1*)(((PBYTE)key) + layout->cbSize))
+		{
+			Layout newKeyLayout = { key->VirtualKey, key->Attributes, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
+			for (int i = 0; i < layout->nModifications; i++) {
+				newKeyLayout.wch[i] = key->wch[i];
+			}
+
+			newLayout.push_back(newKeyLayout);
+		}
+	}
+
+	return newLayout;
+}
+
 bool Keyboard::changeLayout(const wchar_t* DLLName) {
-	if (layoutDLL) FreeLibrary(layoutDLL);
+	if (layoutDLL) {
+		FreeLibrary(layoutDLL);
+	}
+
 	layoutDLL = LoadLibraryW(DLLName); 
 
 	if (layoutDLL) {
-		auto KbdLayerDescriptor = GetProcAddress(layoutDLL, "KbdLayerDescriptor");
-		layout = (KBDTABLES*)KbdLayerDescriptor();
-
+		FARPROC KbdLayerDescriptor = GetProcAddress(layoutDLL, "KbdLayerDescriptor");
+		locale = (KBDTABLES*)KbdLayerDescriptor();
+		keysLayout = getKeysLayout(locale);
 		return true;
 	}
 	return false;
 }
+
+
 
 void Keyboard::setKeyState(BYTE index, SHORT state) {
 	keys[index].setState(state);
@@ -140,6 +169,12 @@ void Keyboard::setKeyState(BYTE index, SHORT state) {
 
 const std::vector<Key>& Keyboard::getKeys() const {
 	return keys;
+}
+const KBDTABLES& Keyboard::getLocale() const {
+	return *locale;
+}
+const std::vector<Layout>& Keyboard::getKeysLayout() const {
+	return keysLayout;
 }
 
 

