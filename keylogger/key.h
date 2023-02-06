@@ -7,18 +7,15 @@ class Key {
 private:
 	SHORT state;
 	bool alternating;
-protected:
-	void setState(SHORT state);
 public:
 	const BYTE value;		
 	static const int PRESSED;
 	static const int TOGGLED;
 
 	Key(BYTE value);
+	void setState(SHORT state);
 
 	bool isPressed() const;
 	bool isAlternating() const;
 	bool isToggled() const;
-
-	friend Keyboard;
 };

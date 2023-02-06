@@ -18,10 +18,10 @@ void Key::setState(SHORT state) {
 }
 
 bool Key::isPressed() const {
-	return (state & PRESSED);
+	return state & PRESSED;
 }
 bool Key::isToggled() const {
-	return (GetKeyState(value) & TOGGLED);
+	return GetKeyState(value) & TOGGLED;
 }
 bool Key::isAlternating() const {
 	return alternating;
