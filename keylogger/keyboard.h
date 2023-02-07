@@ -5,19 +5,21 @@
 #include <kbd.h>
 #include "key.h"
 
-using milliseconds = std::chrono::milliseconds;
 using namespace std::literals::chrono_literals;
-using Layout = VK_TO_WCHARS10;
+
+using milliseconds = std::chrono::milliseconds;
+using KeyLayout = VK_TO_WCHARS10;
+using DLL = HMODULE;
 
 class Keyboard {
 private:
+	DLL locale;
+	const KBDTABLES* layout;
+
 	std::vector<Key> keys;
+	std::vector<KeyLayout> keysLayout;
 
-	std::vector<Layout> keysLayout;
-	const KBDTABLES* locale;
-	static const std::vector<Layout> getKeysLayout(const KBDTABLES* locale);
-
-	HMODULE layoutDLL;
+	static const std::vector<KeyLayout> makeKeysLayout(const KBDTABLES* layout);
 protected:
 	void setKeyState(BYTE index, SHORT state);
 public:
@@ -28,8 +30,7 @@ public:
 
 	bool changeLayout(const wchar_t* DLLName);
 
+	const KBDTABLES& getLayout() const;
 	const std::vector<Key>& getKeys() const;
-	const std::vector<Layout>& getKeysLayout() const;
-	const KBDTABLES& getLocale() const;
-	
+	const std::vector<KeyLayout>& getKeysLayout() const;
 };

