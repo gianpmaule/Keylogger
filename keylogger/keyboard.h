@@ -3,13 +3,19 @@
 #include <vector>
 #include <chrono>
 #include <kbd.h>
+#include <string>
 #include "key.h"
 
 using namespace std::literals::chrono_literals;
 
 using milliseconds = std::chrono::milliseconds;
-using KeyLayout = VK_TO_WCHARS10;
 using DLL = HMODULE;
+
+struct KeyLayout {
+	BYTE  VirtualKey;
+	BYTE  Attributes;
+	std::wstring wch[10];
+};
 
 class Keyboard {
 private:

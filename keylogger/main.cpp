@@ -1,3 +1,4 @@
+#include "console.h"
 #include "keylogger.h"
 
 int main(int argc, char** argv) {

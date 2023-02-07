@@ -108,6 +108,3 @@ const std::vector<Key>& Keyboard::getKeys() const {
 const std::vector<KeyLayout>& Keyboard::getKeysLayout() const {
 	return keysLayout;
 }
-
-
-
