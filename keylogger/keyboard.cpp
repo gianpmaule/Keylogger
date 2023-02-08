@@ -68,6 +68,10 @@ const std::vector<KeyLayout> Keyboard::makeKeysLayout(const KBDTABLES* layout) {
 			; keyLayout->VirtualKey
 			; keyLayout = (VK_TO_WCHARS1*)(((PBYTE)keyLayout) + keysLayout->cbSize))
 		{
+			if (keyLayout->VirtualKey == VK_ESCAPE || keyLayout->VirtualKey == VK_F1 || keyLayout->VirtualKey == VK_F2 || keyLayout->VirtualKey == VK_F3 || keyLayout->VirtualKey == VK_F4 || keyLayout->VirtualKey == VK_F5 || keyLayout->VirtualKey == VK_F6 || keyLayout->VirtualKey == VK_F7 || keyLayout->VirtualKey == VK_F8 || keyLayout->VirtualKey == VK_F9 || keyLayout->VirtualKey == VK_F10 || keyLayout->VirtualKey == VK_F11 || keyLayout->VirtualKey == VK_F12 || keyLayout->VirtualKey == VK_SNAPSHOT || keyLayout->VirtualKey == VK_SCROLL || keyLayout->VirtualKey == VK_PAUSE || keyLayout->VirtualKey == VK_BACK || keyLayout->VirtualKey == VK_INSERT || keyLayout->VirtualKey == VK_HOME || keyLayout->VirtualKey == VK_PRIOR || keyLayout->VirtualKey == VK_NUMLOCK || keyLayout->VirtualKey == VK_TAB || keyLayout->VirtualKey == VK_DELETE || keyLayout->VirtualKey == VK_END || keyLayout->VirtualKey == VK_NEXT || keyLayout->VirtualKey == VK_CAPITAL || keyLayout->VirtualKey == VK_RETURN || keyLayout->VirtualKey == VK_LSHIFT || keyLayout->VirtualKey == VK_RSHIFT || keyLayout->VirtualKey == VK_UP || keyLayout->VirtualKey == VK_LCONTROL || keyLayout->VirtualKey == VK_LWIN || keyLayout->VirtualKey == VK_LMENU || keyLayout->VirtualKey == VK_RMENU || keyLayout->VirtualKey == VK_RWIN || keyLayout->VirtualKey == VK_APPS || keyLayout->VirtualKey == VK_RCONTROL || keyLayout->VirtualKey == VK_LEFT || keyLayout->VirtualKey == VK_DOWN || keyLayout->VirtualKey == VK_RIGHT) {
+				continue;
+			}
+
 			KeyLayout newKeyLayout = { keyLayout->VirtualKey, keyLayout->Attributes };
 
 			for (int i = 0; i < keysLayout->nModifications; i++) {

