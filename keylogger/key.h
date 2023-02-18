@@ -1,19 +1,20 @@
 #pragma once
 #include <Windows.h>
 
-class Keyboard;
+using WinState = SHORT;
 
 class Key {
 private:
-	SHORT state;
+	bool pressed;
 	bool alternating;
+	bool toggled;
 public:
-	const BYTE value;		
-	static const int PRESSED;
-	static const int TOGGLED;
+	const BYTE vk;	
+	Key(BYTE vk);
 
-	Key(BYTE value);
-	void setState(SHORT state);
+	static const WinState WINPRESSED; //GETKEYSTATE PRESSED IDENTIFIER BIT
+	static const WinState WINTOGGLED; //GETKEYSTATE TOGGLED IDENTIFIER BIT
+	void setState(WinState state);
 
 	bool isPressed() const;
 	bool isAlternating() const;

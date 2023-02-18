@@ -1,28 +1,29 @@
 #pragma once
 #include "key.h"
 
-constexpr int Key::PRESSED = 0x8000;
-constexpr int Key::TOGGLED = 0x0001;
+const WinState Key::WINPRESSED = 0b0000000010000000;
+const WinState Key::WINTOGGLED = 0x0000000000000001;
 
-Key::Key(BYTE value)
-	: value(value)
-	, state(0)
-	, alternating(false) {}
+Key::Key(BYTE vk)
+	: vk(vk)
+	, pressed(false)
+	, alternating(false)
+	, toggled(false) {}
 
-void Key::setState(SHORT state) {
-	bool oldpressed = isPressed();
-	this->state = state;
-	bool curpressed = isPressed();
+void Key::setState(WinState state) {
+	bool oldpressed = pressed;
 
-	alternating = oldpressed != curpressed ? true : false;
+	pressed = state & WINPRESSED;
+	alternating = oldpressed != pressed ? true : false;
+	toggled = state & WINTOGGLED;
 }
 
 bool Key::isPressed() const {
-	return state & PRESSED;
-}
-bool Key::isToggled() const {
-	return GetKeyState(value) & TOGGLED;
+	return pressed;
 }
 bool Key::isAlternating() const {
 	return alternating;
+}
+bool Key::isToggled() const {
+	return toggled;
 }
