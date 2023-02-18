@@ -11,5 +11,7 @@ private:
 	void show();
 public:
 	Console();
-	void toggleWindow(const std::vector<Key>& keys);
+	void listen(const std::vector<Key>& keys);
+	void toggleWindow();
+	void destroyWindow();
 };
