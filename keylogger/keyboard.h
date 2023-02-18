@@ -32,9 +32,9 @@ public:
 	const milliseconds polling;
 	const static BYTE KEYBOARDSIZE;
 
-	Keyboard();
+	Keyboard(const char* dll);
 
-	bool changeLayout(const wchar_t* DLLName);
+	bool changeLayout(const char* dll);
 
 	const KBDTABLES& getLayout() const;
 	const std::vector<Key>& getKeys() const;

@@ -3,12 +3,12 @@
 #include <iostream>
 
 
-Keyboard::Keyboard()
+Keyboard::Keyboard(const char* dll)
 	: keys()
 	, polling(1ms)
 	, locale(nullptr) 
 {
-	changeLayout(L"KBDUSX");
+	changeLayout(dll);
 
 	keys.reserve(KEYBOARDSIZE);
 	for (BYTE i = 0; i < KEYBOARDSIZE; i++) {
@@ -16,10 +16,10 @@ Keyboard::Keyboard()
 	}
 }
 
-bool Keyboard::changeLayout(const wchar_t* DLLName) {
+bool Keyboard::changeLayout(const char* dll) {
 	if (locale) FreeLibrary(locale);
 
-	locale = LoadLibraryW(DLLName);
+	locale = LoadLibraryA(dll);
 
 	if (locale) {
 		auto KbdLayerDescriptor = GetProcAddress(locale, "KbdLayerDescriptor");

