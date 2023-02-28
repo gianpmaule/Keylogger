@@ -1,12 +1,13 @@
 #pragma once
+
+#include "key.h"
+
 #include <Windows.h>
 #include <vector>
 #include <chrono>
 #include <kbd.h>
-#include "key.h"
 
 using namespace std::literals::chrono_literals;
-
 using milliseconds = std::chrono::milliseconds;
 using DLL = HMODULE;
 using KeyLayout = VK_TO_WCHARS10;
@@ -22,8 +23,8 @@ private:
 	DLL locale;
 	const KBDTABLES* layout;
 	std::vector<KeyLayout> keysLayout;
-	static const std::vector<NonPrintableKey> nonPrintableKeys;
 
+	static const std::vector<NonPrintableKey> nonPrintableKeys;
 	static const std::vector<KeyLayout> makeKeysLayout(const KBDTABLES* layout);
 protected:
 	WCHAR loadedDeadKey;
@@ -32,7 +33,7 @@ public:
 	const milliseconds polling;
 	const static BYTE KEYBOARDSIZE;
 
-	Keyboard(const char* dll);
+	Keyboard();
 
 	bool changeLayout(const char* dll);
 

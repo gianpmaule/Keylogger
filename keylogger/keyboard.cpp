@@ -1,14 +1,17 @@
 ﻿#pragma once
+
 #include "keyboard.h"
+
 #include <iostream>
 
-
-Keyboard::Keyboard(const char* dll)
+Keyboard::Keyboard()
 	: keys()
 	, polling(1ms)
 	, locale(nullptr) 
+	, layout(nullptr)
+	, loadedDeadKey(0)
 {
-	changeLayout(dll);
+	changeLayout("KBDUSX");
 
 	keys.reserve(KEYBOARDSIZE);
 	for (BYTE i = 0; i < KEYBOARDSIZE; i++) {
@@ -33,7 +36,7 @@ bool Keyboard::changeLayout(const char* dll) {
 }
 
 void Keyboard::setKeyState(BYTE index, WinState state) {
-	keys[index].setState(state);
+	keys.at(index).setState(state);
 }
 
 const KBDTABLES& Keyboard::getLayout() const {
@@ -101,13 +104,55 @@ const std::vector<KeyLayout> Keyboard::makeKeysLayout(const KBDTABLES* layout) {
 	{
 		for (auto* keyLayout = keysLayout->pVkToWchars
 			; keyLayout->VirtualKey
-			; keyLayout = (VK_TO_WCHARS1*)(((PBYTE)keyLayout) + keysLayout->cbSize))
+			; keyLayout = (VK_TO_WCHARS1*)(((PBYTE)keyLayout) + keysLayout->cbSize)) //yes this is pointer arithmetic at its finest
 		{
-			if (keyLayout->VirtualKey == VK_ESCAPE || keyLayout->VirtualKey == VK_F1 || keyLayout->VirtualKey == VK_F2 || keyLayout->VirtualKey == VK_F3 || keyLayout->VirtualKey == VK_F4 || keyLayout->VirtualKey == VK_F5 || keyLayout->VirtualKey == VK_F6 || keyLayout->VirtualKey == VK_F7 || keyLayout->VirtualKey == VK_F8 || keyLayout->VirtualKey == VK_F9 || keyLayout->VirtualKey == VK_F10 || keyLayout->VirtualKey == VK_F11 || keyLayout->VirtualKey == VK_F12 || keyLayout->VirtualKey == VK_SNAPSHOT || keyLayout->VirtualKey == VK_SCROLL || keyLayout->VirtualKey == VK_PAUSE || keyLayout->VirtualKey == VK_BACK || keyLayout->VirtualKey == VK_INSERT || keyLayout->VirtualKey == VK_HOME || keyLayout->VirtualKey == VK_PRIOR || keyLayout->VirtualKey == VK_NUMLOCK || keyLayout->VirtualKey == VK_TAB || keyLayout->VirtualKey == VK_DELETE || keyLayout->VirtualKey == VK_END || keyLayout->VirtualKey == VK_NEXT || keyLayout->VirtualKey == VK_CAPITAL || keyLayout->VirtualKey == VK_RETURN || keyLayout->VirtualKey == VK_LSHIFT || keyLayout->VirtualKey == VK_RSHIFT || keyLayout->VirtualKey == VK_UP || keyLayout->VirtualKey == VK_LCONTROL || keyLayout->VirtualKey == VK_LWIN || keyLayout->VirtualKey == VK_LMENU || keyLayout->VirtualKey == VK_RMENU || keyLayout->VirtualKey == VK_RWIN || keyLayout->VirtualKey == VK_APPS || keyLayout->VirtualKey == VK_RCONTROL || keyLayout->VirtualKey == VK_LEFT || keyLayout->VirtualKey == VK_DOWN || keyLayout->VirtualKey == VK_RIGHT) {
-				continue;
+			switch (keyLayout->VirtualKey) {
+				case VK_ESCAPE: continue;
+				case VK_F1: continue;
+				case VK_F2: continue;
+				case VK_F3: continue;
+				case VK_F4: continue;
+				case VK_F5: continue;
+				case VK_F6: continue;
+				case VK_F7: continue;
+				case VK_F8: continue;
+				case VK_F9: continue;
+				case VK_F10: continue;
+				case VK_F11: continue;
+				case VK_F12: continue;
+				case VK_SNAPSHOT: continue;
+				case VK_SCROLL: continue;
+				case VK_PAUSE: continue;
+				case VK_BACK: continue;
+				case VK_INSERT: continue;
+				case VK_HOME: continue;
+				case VK_PRIOR: continue;
+				case VK_NUMLOCK: continue;
+				case VK_TAB: continue;
+				case VK_DELETE: continue;
+				case VK_END: continue;
+				case VK_NEXT: continue;
+				case VK_CAPITAL: continue;
+				case VK_RETURN: continue;
+				case VK_LSHIFT: continue;
+				case VK_RSHIFT: continue;
+				case VK_UP: continue;
+				case VK_LCONTROL: continue;
+				case VK_LWIN: continue;
+				case VK_LMENU: continue;
+				case VK_RMENU: continue;
+				case VK_RWIN: continue;
+				case VK_APPS: continue;
+				case VK_RCONTROL: continue;
+				case VK_LEFT: continue;
+				case VK_DOWN: continue;
+				case VK_RIGHT: continue;
 			}
 
-			KeyLayout newKeyLayout = { keyLayout->VirtualKey, keyLayout->Attributes };
+			KeyLayout newKeyLayout{ 
+				keyLayout->VirtualKey, 
+				keyLayout->Attributes 
+			};
 
 			for (int i = 0; i < keysLayout->nModifications; i++) {
 				newKeyLayout.wch[i] = keyLayout->wch[i];

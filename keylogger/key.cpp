@@ -1,7 +1,8 @@
 #pragma once
+
 #include "key.h"
 
-const WinState Key::WINPRESSED = 0b0000000010000000;
+const WinState Key::WINPRESSED = 0b0000000100000000;
 const WinState Key::WINTOGGLED = 0x0000000000000001;
 
 Key::Key(BYTE vk)
